@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f6f54">
+<title>Almas entre Nosotros</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icono.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icono-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: una columna para celular; pestañas Registros / Administrar, lista de fichas con folio, hoja inferior para registrar. */
+:root {
+  --bg: #f3f5f2;
+  --surface: #ffffff;
+  --ink: #17251f;
+  --muted: #5d6b64;
+  --line: #d9e0db;
+  --accent: #1f6f54;      /* verde sello */
+  --accent-ink: #ffffff;
+  --accent-soft: #e1efe8;
+  --warn: #9a5b00;
+  --warn-soft: #fbefd9;
+  --danger: #b3261e;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #111815; --surface: #19231f; --ink: #e6eee9; --muted: #9aaba2; --line: #2c3a34;
+  --accent: #5cc79b; --accent-ink: #0c1a14; --accent-soft: #1d3a2e;
+  --warn: #f2b45a; --warn-soft: #3a2c14; --danger: #ff8a80; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #111815; --surface: #19231f; --ink: #e6eee9; --muted: #9aaba2; --line: #2c3a34;
+  --accent: #5cc79b; --accent-ink: #0c1a14; --accent-soft: #1d3a2e;
+  --warn: #f2b45a; --warn-soft: #3a2c14; --danger: #ff8a80; color-scheme: dark }
+
+* { box-sizing: border-box }
+html, body { height: 100% }
+body { margin: 0 }
+[hidden] { display: none !important }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.45 }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg) }
+.wrap { max-width: 640px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 16px 120px }
+
+header { display: grid; gap: 4px; padding-block: 8px 12px }
+h1 { font-family: var(--display); font-weight: 800; font-size: 1.75rem; line-height: 1.1; margin: 0; text-wrap: balance; letter-spacing: -0.01em }
+h2 { font-family: var(--display); font-size: 1.2rem; margin: 0 }
+.sub { color: var(--muted); margin: 0; font-size: 0.95rem }
+
+.tabs { display: flex; gap: 4px; background: var(--line); padding: 4px; border-radius: 12px; margin-block: 4px 8px }
+.tabs button { flex: 1; border: 0; background: transparent; color: var(--muted); padding: 10px; border-radius: 9px; font-weight: 700 }
+.tabs button[aria-selected="true"] { background: var(--surface); color: var(--ink) }
+
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-block: 8px }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: grid; gap: 2px; text-align: left; font: inherit; color: inherit; cursor: pointer }
+.stat[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent) }
+.stat b { font-family: var(--display); font-size: 1.5rem; font-variant-numeric: tabular-nums; line-height: 1 }
+.stat span { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted) }
+
+.tools { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 8px; display: grid; grid-template-columns: 1fr; gap: 8px }
+input, select, textarea { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; width: 100%; min-width: 0 }
+input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+textarea { min-height: 70px; resize: vertical }
+
+button { font: inherit; cursor: pointer }
+.btn { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 10px; padding: 10px 14px; font-weight: 700 }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent) }
+.btn.danger { color: var(--danger) }
+.btn:disabled { opacity: .5; cursor: default }
+.link { background: none; border: 0; color: var(--accent); font-weight: 700; padding: 4px 0; text-align: left }
+
+.list { display: grid; gap: 10px; margin-top: 4px }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 8px }
+.card-top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start }
+.card h3 { margin: 0; font-size: 1.05rem; line-height: 1.25; min-width: 0; overflow-wrap: anywhere }
+.folio { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); letter-spacing: 0.04em }
+.meta { display: flex; flex-wrap: wrap; gap: 4px 14px; color: var(--muted); font-size: 0.9rem }
+.meta span { min-width: 0; overflow-wrap: anywhere }
+.meta .act { color: var(--ink); font-weight: 700 }
+.notes { font-size: 0.9rem; margin: 0; overflow-wrap: anywhere }
+.pill { flex: none; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; letter-spacing: 0.03em; white-space: nowrap }
+.pill.pend { background: var(--warn-soft); color: var(--warn) }
+.pill.ok { background: var(--accent-soft); color: var(--accent) }
+.actions { display: flex; gap: 8px; flex-wrap: wrap }
+.actions .btn { padding: 8px 12px; font-size: 0.9rem }
+
+.empty { text-align: center; color: var(--muted); padding: 32px 16px; border: 1.5px dashed var(--line); border-radius: 14px }
+.empty strong { display: block; color: var(--ink); font-family: var(--display); font-size: 1.15rem; margin-bottom: 4px }
+.banner { background: var(--warn-soft); color: var(--warn); border-radius: 10px; padding: 10px 12px; font-size: 0.9rem; margin-block: 8px }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 12px; margin-top: 12px }
+.panel p { margin: 0; color: var(--muted); font-size: 0.92rem }
+.addrow { display: flex; gap: 8px }
+.addrow input { flex: 1 }
+.acts { display: grid; gap: 0; list-style: none; margin: 0; padding: 0 }
+.acts li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-block: 10px; border-top: 1px solid var(--line) }
+.acts li:first-child { border-top: 0 }
+.acts li span { min-width: 0; overflow-wrap: anywhere }
+.acts li small { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap }
+.acts .btn { padding: 6px 10px; font-size: 0.85rem; flex: none }
+.bignum { font-family: var(--display); font-size: 2rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1 }
+
+.fab { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 8; background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 999px; padding: 16px 22px; font-weight: 700; font-size: 1rem; box-shadow: 0 6px 20px rgba(0,0,0,.25) }
+
+.sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 20; display: flex; align-items: flex-end; justify-content: center }
+.sheet { background: var(--surface); width: 100%; max-width: 640px; max-height: 92%; overflow-y: auto; border-radius: 18px 18px 0 0; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-top: 18px; padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px)) }
+.sheet h2 { margin-bottom: 12px; font-size: 1.3rem }
+form { display: grid; gap: 12px }
+label { display: grid; gap: 4px; font-weight: 700; font-size: 0.9rem }
+label small, .hint { font-weight: 400; color: var(--muted); font-size: 0.85rem }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px }
+@media (max-width: 380px) { .row2 { grid-template-columns: 1fr } }
+.seg { display: flex; gap: 8px }
+.seg label { flex: 1; display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 10px; padding: 10px; font-weight: 400 }
+.seg input { width: auto }
+.form-actions { display: flex; gap: 8px; justify-content: flex-end; padding-top: 4px }
+.err { color: var(--danger); font-size: 0.9rem; margin: 0 }
+.matches { display: grid; border: 1px solid var(--line); border-radius: 10px; overflow: hidden }
+.matches button { display: flex; gap: 10px; align-items: baseline; text-align: left; background: var(--surface); color: var(--ink); border: 0; border-top: 1px solid var(--line); padding: 10px 12px }
+.matches button:first-child { border-top: 0 }
+.matches button:hover { background: var(--accent-soft) }
+.matches code, .chosen code { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); flex: none }
+.matches span { min-width: 0; overflow-wrap: anywhere }
+.chosen { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--accent-soft); border-radius: 10px; padding: 10px 12px }
+.chosen div { display: grid; min-width: 0 }
+.chosen b { overflow-wrap: anywhere }
+
+.quick { background: var(--surface); border: 1.5px solid var(--accent); border-radius: 16px; padding: 14px; display: grid; gap: 10px; margin-block: 4px 8px }
+.quick-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px }
+.quick-head div { min-width: 0 }
+.eyebrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 700 }
+.quick-act { font-family: var(--display); font-size: 1.35rem; font-weight: 800; line-height: 1.15; overflow-wrap: anywhere }
+.quick input { font-size: 1.15rem; padding: 14px }
+.qres { display: grid; gap: 8px }
+.qres button { display: grid; gap: 2px; text-align: left; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 12px; padding: 12px 14px }
+.qres button:not(:disabled):hover, .qres button:not(:disabled):focus-visible { border-color: var(--accent) }
+.qres button:first-child:not(:disabled) { background: var(--accent); color: var(--accent-ink); border-color: var(--accent) }
+.qres button:first-child:not(:disabled) code { color: inherit; opacity: .8 }
+.qres button b { font-size: 1.05rem; overflow-wrap: anywhere }
+.qres code { font-family: var(--mono); font-size: 0.8rem; color: var(--muted) }
+.qres button:disabled { opacity: .65; cursor: default }
+.last { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--accent-soft); color: var(--accent); border-radius: 10px; padding: 10px 12px; font-weight: 700 }
+.last span { min-width: 0; overflow-wrap: anywhere }
+.last .btn { padding: 6px 10px; font-size: 0.85rem; flex: none }
+
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(84px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 10px; z-index: 30; font-size: 0.95rem; max-width: calc(100% - 32px) }
+.foot { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px }
+@media (prefers-reduced-motion: no-preference) { .sheet { animation: up .18s ease-out } @keyframes up { from { transform: translateY(30px); opacity: .6 } } }
+.lock { min-height: 100%; display: grid; place-items: center; padding-block: 40px }
+.lock form { width: 100%; max-width: 360px; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px; gap: 14px }
+.lock h1 { font-size: 2rem }
+.lock input { font-size: 1.2rem; letter-spacing: 0.04em }
+</style>
+</head>
+<body>
+<div class="wrap lock" id="lock" hidden>
+  <form id="lockform">
+    <div class="eyebrow">Registro de constancias</div>
+    <h1>Almas entre Nosotros</h1>
+    <label>Código de acceso
+      <input id="lcode" type="password" autocomplete="current-password" required>
+    </label>
+    <p class="err" id="lerr" hidden></p>
+    <button class="btn primary" id="lbtn">Entrar</button>
+  </form>
+</div>
+
+<div class="wrap" id="app" hidden>
+  <header>
+    <h1>Almas entre Nosotros</h1>
+    <p class="sub">Registro de alumnos para constancia de participación.</p>
+  </header>
+
+  <div class="tabs" role="tablist" id="tabs" hidden>
+    <button role="tab" id="t-reg" aria-selected="true">Registros</button>
+    <button role="tab" id="t-adm" aria-selected="false">Administrar</button>
+  </div>
+
+  <div id="banner" class="banner" hidden></div>
+
+  <!-- Vista: registros -->
+  <section id="v-reg">
+    <div class="quick" id="quick">
+      <div class="quick-head">
+        <div><div class="eyebrow">Registrando en</div><div class="quick-act" id="q-act">Cargando…</div></div>
+        <button class="link" id="q-change" hidden>Cambiar</button>
+      </div>
+      <input id="q-in" type="search" autocomplete="off" enterkeyhint="done" placeholder="Di o escribe el nombre del alumno" aria-label="Nombre o número de control del alumno">
+      <div class="qres" id="q-res"></div>
+      <div class="last" id="q-last" hidden><span id="q-last-txt"></span><button class="btn" id="q-undo">Deshacer</button></div>
+      <p class="hint" id="q-hint" style="margin:0">Toca el alumno para registrarlo. Para dictar, usa el micrófono de tu teclado.</p>
+    </div>
+
+    <div class="stats" role="group" aria-label="Filtrar por estado">
+      <button class="stat" id="f-todos" data-f="todos" aria-pressed="true"><b id="n-todos">0</b><span>Total</span></button>
+      <button class="stat" id="f-pend" data-f="pendiente" aria-pressed="false"><b id="n-pend">0</b><span>Pendientes</span></button>
+      <button class="stat" id="f-ok" data-f="entregada" aria-pressed="false"><b id="n-ok">0</b><span>Entregadas</span></button>
+    </div>
+
+    <div class="tools">
+      <select id="fact" aria-label="Filtrar por actividad"><option value="">Todas las actividades</option></select>
+      <input id="q" type="search" placeholder="Buscar por nombre o número de control" aria-label="Buscar">
+    </div>
+
+    <div id="list" class="list">
+      <div class="empty"><strong>Cargando registros…</strong>En un momento aparecen los alumnos guardados.</div>
+    </div>
+
+    <div class="foot">
+      <button class="btn" id="csv" hidden>Descargar lista en Excel</button>
+      <button class="btn" id="salir">Salir</button>
+    </div>
+  </section>
+
+  <!-- Vista: administrador -->
+  <section id="v-adm" hidden>
+    <div class="panel">
+      <h2>Actividad activa</h2>
+      <p>Todos los registros rápidos se guardan en esta actividad, en todos los celulares.</p>
+      <select id="activa" aria-label="Actividad activa"></select>
+    </div>
+
+    <div class="panel">
+      <h2>Actividades</h2>
+      <p>Las actividades que agregues aquí aparecen para elegir al registrar a un alumno.</p>
+      <form id="actform" class="addrow">
+        <input id="actname" placeholder="Ej. Altares, Mitos y leyendas, Catrinas" autocomplete="off" aria-label="Nombre de la actividad">
+        <button class="btn primary" id="actadd">Agregar</button>
+      </form>
+      <ul class="acts" id="actlist"></ul>
+    </div>
+
+    <div class="panel">
+      <h2>Catálogo de alumnos</h2>
+      <div class="bignum" id="catcount">0</div>
+      <p id="catinfo">Alumnos cargados con número de control y nombre. Al registrar, se buscan aquí.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Descargar bases de datos</h2>
+      <p>Un archivo de Excel con tres hojas: Registros, Catálogo de alumnos y Actividades.</p>
+      <button class="btn primary" id="xlsx">Descargar Excel</button>
+    </div>
+  </section>
+</div>
+
+<button class="fab" id="add">+ Registrar alumno</button>
+
+<div class="sheet-bg" id="sheet" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <h2 id="sheet-title">Registrar alumno</h2>
+    <form id="form" novalidate>
+      <div id="pick">
+        <label>Alumno
+          <input id="buscar" autocomplete="off" placeholder="Número de control o nombre">
+        </label>
+        <div class="matches" id="matches" hidden></div>
+        <button type="button" class="link" id="manual">No aparece en la lista: escribir a mano</button>
+      </div>
+      <div class="chosen" id="chosen" hidden>
+        <div><code id="ch-control"></code><b id="ch-nombre"></b></div>
+        <button type="button" class="btn" id="change">Cambiar</button>
+      </div>
+      <div class="row2" id="manualfields" hidden>
+        <label>Número de control
+          <input id="control" autocomplete="off" inputmode="numeric">
+        </label>
+        <label>Nombre completo
+          <input id="nombre" autocomplete="off">
+        </label>
+      </div>
+      <label>Actividad
+        <select id="actividad"></select>
+      </label>
+      <p class="hint" id="noacts" hidden>Aún no hay actividades. El administrador debe agregarlas en la pestaña Administrar.</p>
+      <label>Fecha de participación
+        <input id="fecha" type="date">
+      </label>
+      <label>Notas <small>(opcional)</small>
+        <textarea id="notas" placeholder="Ej. Primer lugar, equipo 3"></textarea>
+      </label>
+      <div class="seg" role="radiogroup" aria-label="Estado de la constancia">
+        <label><input type="radio" name="estado" id="e-pend" value="pendiente" checked> Pendiente</label>
+        <label><input type="radio" name="estado" id="e-ok" value="entregada"> Entregada</label>
+      </div>
+      <p class="err" id="ferr" hidden></p>
+      <div class="form-actions">
+        <button type="button" class="btn danger" id="del" hidden>Eliminar</button>
+        <span style="flex:1"></span>
+        <button type="button" class="btn" id="cancel">Cancelar</button>
+        <button type="submit" class="btn primary" id="save">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
